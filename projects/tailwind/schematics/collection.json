@@ -1,0 +1,13 @@
+{
+  "$schema": "../../../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "ng-add": {
+      "description": "Add Tailwind CSS configuration to an Angular project",
+      "factory": "./ng-add/index#ngAdd"
+    },
+    "ng-remove": {
+      "description": "Remove Tailwind CSS configuration from an Angular project",
+      "factory": "./ng-remove/index#ngRemove"
+    }
+  }
+}

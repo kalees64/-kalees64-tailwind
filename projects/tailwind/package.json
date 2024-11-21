@@ -1,0 +1,33 @@
+{
+  "name": "@kalees64/tailwind",
+  "version": "0.0.9",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.schematics.json",
+    "postbuild": "copyfiles schematics/collection.json ../../dist/tailwind/"
+  },
+  "ng-add": {
+    "save": "true"
+  },
+  "schematics": "./schematics/collection.json",
+  "keywords": [
+    "angular",
+    "angular-component",
+    "typescript",
+    "@kalees64",
+    "kalees64",
+    "tailwind",
+    "angular-tailwind"
+  ],
+  "peerDependencies": {
+    "@angular/common": "^18.2.0",
+    "@angular/core": "^18.2.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false
+}

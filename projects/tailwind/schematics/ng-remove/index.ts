@@ -1,19 +1,55 @@
 import { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 
 export function ngRemove(): Rule {
-  return (tree: Tree, _context: SchematicContext) => {
+  return (tree: Tree, context: SchematicContext) => {
     // Remove Tailwind dependencies
-    const packageJsonPath = 'package.json';
+    // const packageJsonPath = 'package.json';
+    // if (tree.exists(packageJsonPath)) {
+    //   const packageJson = JSON.parse(tree.read(packageJsonPath)!.toString());
+
+    //   const dependencies = packageJson.dependencies || {};
+    //   delete dependencies['tailwindcss'];
+    //   delete dependencies['autoprefixer'];
+    //   delete dependencies['postcss'];
+
+    //   packageJson.dependencies = dependencies;
+    //   tree.overwrite(packageJsonPath, JSON.stringify(packageJson, null, 2));
+    // }
+
+    //Remove packages M2
+    const packageJsonPath = '/package.json';
+
     if (tree.exists(packageJsonPath)) {
-      const packageJson = JSON.parse(tree.read(packageJsonPath)!.toString());
+      const buffer = tree.read(packageJsonPath);
+      if (buffer) {
+        const content = buffer.toString('utf-8');
+        const packageJson = JSON.parse(content);
 
-      const dependencies = packageJson.dependencies || {};
-      delete dependencies['tailwindcss'];
-      delete dependencies['autoprefixer'];
-      delete dependencies['postcss'];
+        // Remove the packages from dependencies
+        const packagesToRemove = [
+          'tailwindcss',
+          'postcss',
+          'autoprefixer',
+          '@kalees64/tailwind',
+        ];
+        packagesToRemove.forEach((pkg) => {
+          if (packageJson.dependencies && packageJson.dependencies[pkg]) {
+            delete packageJson.dependencies[pkg];
+          }
+          if (packageJson.devDependencies && packageJson.devDependencies[pkg]) {
+            delete packageJson.devDependencies[pkg];
+          }
+        });
 
-      packageJson.dependencies = dependencies;
-      tree.overwrite(packageJsonPath, JSON.stringify(packageJson, null, 2));
+        // Write the updated package.json back
+        tree.overwrite(packageJsonPath, JSON.stringify(packageJson, null, 2));
+
+        // Schedule npm install task
+        context.addTask(new NodePackageInstallTask());
+      }
+    } else {
+      context.logger.warn(`No package.json file found.`);
     }
 
     // Remove Tailwind configuration files

@@ -1,6 +1,6 @@
 {
   "name": "@kalees64/tailwind",
-  "version": "0.0.13",
+  "version": "0.0.26",
   "private": false,
   "publishConfig": {
     "access": "public"
@@ -24,10 +24,19 @@
   ],
   "peerDependencies": {
     "@angular/common": "^18.2.0",
-    "@angular/core": "^18.2.0"
+    "@angular/core": "^18.2.0",
+    "inquirer": "^12.1.0",
+    "ngx-toastr": "^19.0.0",
+    "tailwindcss": "^3.4.15"
   },
   "dependencies": {
     "tslib": "^2.3.0"
+  },
+  "allowedNonPeerDependencies": {
+    "bootstrap": "^5.3.3",
+    "@fortawesome/angular-fontawesome": "^0.15.0",
+    "@fortawesome/fontawesome-svg-core": "^6.6.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0"
   },
   "sideEffects": false
 }

@@ -3,6 +3,8 @@ import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 
 export function ngRemove(): Rule {
   return (tree: Tree, context: SchematicContext) => {
+    const log = context.logger.info.bind(context.logger);
+    const warn = context.logger.warn.bind(context.logger);
     // Remove Tailwind dependencies
     // const packageJsonPath = 'package.json';
     // if (tree.exists(packageJsonPath)) {
@@ -87,6 +89,45 @@ export function ngRemove(): Rule {
         );
 
       tree.overwrite(angularJsonPath, JSON.stringify(angularJson, null, 2));
+    }
+
+    // Step 5: Remove ThemeService file
+    const themeServicePath = 'src/app/services/theme.service.ts';
+    if (tree.exists(themeServicePath)) {
+      tree.delete(themeServicePath);
+      log('Deleted ThemeService file.');
+    } else {
+      warn('ThemeService file not found.');
+    }
+
+    // Step 6: Remove ThemeService imports and methods from AppComponent
+    const appComponentPath = 'src/app/app.component.ts';
+    if (tree.exists(appComponentPath)) {
+      const appComponentContent = tree.read(appComponentPath)!.toString();
+
+      const updatedAppComponentContent = appComponentContent
+        .replace(
+          /import\s+{[^}]*ThemeService[^}]*}\s+from\s+'.\/services\/theme.service';?/g,
+          ''
+        )
+        .replace(/private\s+themeService:\s+ThemeService,?\s*/g, '')
+        .replace(
+          /ngOnInit\(\):\s*void\s*{[^}]*this\.themeService\.initializeTheme\(\);?[^}]*}/g,
+          ''
+        )
+        .replace(
+          /toggleTheme\(\):\s*void\s*{[^}]*this\.themeService\.toggleTheme\(\);?[^}]*}/g,
+          ''
+        );
+
+      if (appComponentContent !== updatedAppComponentContent) {
+        tree.overwrite(appComponentPath, updatedAppComponentContent);
+        log('Removed ThemeService-related configurations from AppComponent.');
+      } else {
+        warn('No ThemeService-related configurations found in AppComponent.');
+      }
+    } else {
+      warn('AppComponent file not found.');
     }
 
     return tree;

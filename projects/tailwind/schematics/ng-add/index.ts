@@ -25,6 +25,7 @@ export function ngAdd(_options: any): Rule {
       tree.create(
         'tailwind.config.js',
         `module.exports = {
+        darkMode: 'class',
   content: ['./src/**/*.{html,ts}'],
   theme: {
     extend: {},
@@ -66,6 +67,71 @@ export function ngAdd(_options: any): Rule {
         packageName: 'tailwindcss postcss autoprefixer',
       })
     );
+
+    // Add ThemeService
+
+    const servicesFolderPath = '/src/app/services';
+    if (!tree.exists(servicesFolderPath)) {
+      tree.create(servicesFolderPath + '/.gitkeep', ''); // Ensure folder is created
+    }
+
+    const themeServicePath = `${servicesFolderPath}/theme.service.ts`;
+    if (!tree.exists(themeServicePath)) {
+      tree.create(
+        themeServicePath,
+        `import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ThemeService {
+  private readonly darkThemeClass = 'dark';
+
+  toggleTheme(): void {
+    const body = document.body;
+    if (body.classList.contains(this.darkThemeClass)) {
+      body.classList.remove(this.darkThemeClass);
+      localStorage.setItem('theme', 'light');
+    } else {
+      body.classList.add(this.darkThemeClass);
+      localStorage.setItem('theme', 'dark');
+    }
+  }
+
+  initializeTheme(): void {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.body.classList.add(this.darkThemeClass);
+    } else {
+      document.body.classList.remove(this.darkThemeClass);
+    }
+  }
+}`
+      );
+    }
+
+    // Update AppComponent
+    const appComponentPath = '/src/app/app.component.ts';
+    if (tree.exists(appComponentPath)) {
+      const appComponentContent = tree.read(appComponentPath)!.toString();
+      const updatedAppComponentContent = appComponentContent.replace(
+        'export class AppComponent',
+        `import { OnInit } from '@angular/core';
+import { ThemeService } from './services/theme.service';
+
+export class AppComponent implements OnInit {
+  constructor(private themeService: ThemeService) {}
+
+  ngOnInit(): void {
+    this.themeService.initializeTheme();
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
+  }`
+      );
+      tree.overwrite(appComponentPath, updatedAppComponentContent);
+    }
 
     return tree;
   };

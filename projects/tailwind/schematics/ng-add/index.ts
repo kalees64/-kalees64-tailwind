@@ -129,7 +129,7 @@ export class ThemeService {
     if (tree.exists(appComponentPath)) {
       const appComponentContent = tree.read(appComponentPath)!.toString();
       const updatedAppComponentContent = appComponentContent.replace(
-        'export class AppComponent',
+        'export class AppComponent {',
         `import { OnInit } from '@angular/core';
 import { ThemeService } from './services/theme.service';
 
